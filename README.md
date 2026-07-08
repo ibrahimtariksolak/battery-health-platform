@@ -25,7 +25,7 @@ Veri Simülatörü → Backend API (FastAPI + WebSocket) → SQL Veritabanı (Ti
                                 ↓
                           Dashboard (React)
 
-[Opsiyonel] Termal Görüntü Kaynağı → Termal CV Modülü → Backend API → Dashboard Uyarısı
+Termal Görüntü Kaynağı → Termal CV Modülü → Backend API → Dashboard Uyarısı
 ```
 
 Detaylı mimari diyagram: `docs/architecture.md` (yakında eklenecek)
