@@ -1,0 +1,32 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+.env
+
+# Node / React
+node_modules/
+frontend/build/
+frontend/dist/
+npm-debug.log*
+
+# Veritabanı / veri dosyaları
+*.sqlite3
+db_data/
+thermal-cv/data/*.png
+thermal-cv/data/*.jpg
+!thermal-cv/data/.gitkeep
+
+# IDE
+.vscode/
+.idea/
+*.swp
+
+# İşletim sistemi
+.DS_Store
+Thumbs.db
+
+# Loglar
+*.log
