@@ -2,7 +2,7 @@
 
 **Savunma sanayii ve İKA (İnsansız Kara Aracı) uygulamaları için batarya sağlığı izleme, hücre dengeleme ve öngörücü bakım sistemi**
 
-> Durum: 🚧 Geliştirme aşamasında (Faz 5 — Frontend dashboard)
+> Durum: 🚧 Geliştirme aşamasında (Faz 6 — Termal CV modülü)
 
 ## Proje Nedir?
 
@@ -68,8 +68,8 @@ Detaylı mimari diyagram: `docs/architecture.md` (yakında eklenecek)
 - [x] Faz 2 — Backend API ve gerçek zamanlı akış
 - [x] Faz 3 — BMS mantığı (SoH, hücre dengeleme, termal koruma)
 - [x] Faz 4 — Sürüş karakteri ML modülü
-- [ ] Faz 5 — Frontend dashboard
-- [ ] Faz 6 — Termal CV modülü (opsiyonel)
+- [x] Faz 5 — Frontend dashboard
+- [ ] Faz 6 — Termal CV modülü
 - [ ] Faz 7 — Belgeleme ve sunum hazırlığı
 
 ## Kurulum
