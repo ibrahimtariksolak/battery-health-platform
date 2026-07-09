@@ -9,6 +9,7 @@ import random
 from dataclasses import dataclass, field
 from datetime import datetime, timezone
 from typing import List
+from bms_logic import ThermalProtection, SoHEstimator
 
 # ---- Sabitler (kucuk olcekli bir EV/IKA pack'i baz alinarak) ----
 NOMINAL_CELL_CAPACITY_AH = 50.0           # hucre (grubu) basina anma kapasitesi
@@ -77,7 +78,13 @@ class Cell:
 class BatteryPack:
     pack_id: str
     cells: List[Cell]
-    balance_threshold_v: float = 0.05
+    balance_threshold_v: float = 0.05     # bu farkin ustunde pasif dengeleme tetiklenir
+    soh_estimator: SoHEstimator = field(init=False)
+    thermal_protection: ThermalProtection = field(init=False)
+
+    def __post_init__(self):
+        self.soh_estimator = SoHEstimator(rated_capacity_ah=NOMINAL_CELL_CAPACITY_AH)
+        self.thermal_protection = ThermalProtection()
 
     @classmethod
     def create(cls, pack_id: str, cell_count: int = 8, seed: int = None) -> "BatteryPack":
@@ -95,11 +102,13 @@ class BatteryPack:
             ))
         return cls(pack_id=pack_id, cells=cells)
 
-    def step(self, current_a: float, dt_seconds: float):
+    def step(self, current_a: float, dt_seconds: float, seconds_since_last_reading: float = 0.0):
         for cell in self.cells:
             cell.balancing_active = False
             cell.step(current_a, dt_seconds)
         self._apply_passive_balancing()
+        self.soh_estimator.update(current_a, dt_seconds)
+        self.thermal_protection.update(self.max_temperature, seconds_since_last_reading)
 
     def _apply_passive_balancing(self):
         voltages = [c.voltage for c in self.cells]
@@ -135,5 +144,7 @@ class BatteryPack:
             "pack_soc": self.pack_soc,
             "max_temperature_c": self.max_temperature,
             "cell_voltage_delta": self.cell_voltage_delta,
+            "soh_percent": self.soh_estimator.soh_percent,
+            "thermal_state": self.thermal_protection.state.value,
             "cells": [c.to_dict() for c in self.cells],
         }
