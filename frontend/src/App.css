@@ -1,0 +1,181 @@
+@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Inter:wght@400;500;600;700&display=swap');
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  background: #0d1117;
+  color: #e6edf3;
+  font-family: 'Inter', sans-serif;
+}
+
+.app {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 24px 20px 60px;
+}
+
+.boot-screen {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  align-items: center;
+  justify-content: center;
+  height: 60vh;
+  font-family: 'IBM Plex Mono', monospace;
+}
+.boot-label { letter-spacing: 0.15em; color: #8b949e; font-size: 12px; }
+.boot-status { font-size: 16px; color: #58a6ff; }
+
+.topbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  border-bottom: 1px solid #21262d;
+  padding-bottom: 16px;
+  margin-bottom: 24px;
+}
+.eyebrow {
+  display: block;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 11px;
+  letter-spacing: 0.15em;
+  color: #8b949e;
+  margin-bottom: 4px;
+}
+.topbar h1 {
+  margin: 0;
+  font-size: 26px;
+  font-family: 'IBM Plex Mono', monospace;
+  font-weight: 600;
+}
+
+.conn-indicator {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 12px;
+  letter-spacing: 0.08em;
+}
+.conn-indicator .dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+}
+.conn-indicator.on { color: #3fb950; }
+.conn-indicator.on .dot { background: #3fb950; box-shadow: 0 0 8px #3fb950; animation: pulse 1.6s ease-in-out infinite; }
+.conn-indicator.off { color: #f85149; }
+.conn-indicator.off .dot { background: #f85149; }
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.35; }
+}
+
+.kpi-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 12px;
+  margin-bottom: 24px;
+}
+.kpi {
+  background: #161b22;
+  border: 1px solid #30363d;
+  border-radius: 8px;
+  padding: 14px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.kpi-label {
+  font-size: 11px;
+  color: #8b949e;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+.kpi-value {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 22px;
+  font-weight: 600;
+  color: #e6edf3;
+}
+.kpi-value small { font-size: 13px; color: #8b949e; margin-left: 2px; }
+
+.thermal-badge {
+  align-self: flex-start;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 13px;
+  font-weight: 600;
+  padding: 3px 10px;
+  border-radius: 4px;
+  color: var(--tc);
+  border: 1px solid var(--tc);
+  background: color-mix(in srgb, var(--tc) 15%, transparent);
+}
+
+.charts-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  margin-bottom: 24px;
+}
+.panel {
+  background: #161b22;
+  border: 1px solid #30363d;
+  border-radius: 8px;
+  padding: 16px;
+}
+.panel.wide { grid-column: 1 / -1; }
+.panel h2 {
+  margin: 0 0 12px;
+  font-size: 13px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: #8b949e;
+  font-weight: 600;
+}
+.hint { font-size: 11px; color: #8b949e; margin: 8px 0 0; }
+
+.ml-panel { display: flex; flex-direction: column; gap: 12px; }
+.analyze-btn {
+  align-self: flex-start;
+  background: #238636;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  padding: 10px 18px;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+}
+.analyze-btn:hover:not(:disabled) { background: #2ea043; }
+.analyze-btn:disabled { opacity: 0.6; cursor: not-allowed; }
+
+.ml-error { color: #f85149; font-size: 13px; }
+
+.ml-result {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  background: #0d1117;
+  border: 1px solid #30363d;
+  border-radius: 6px;
+  padding: 12px 14px;
+}
+.style-tag {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 11px;
+  font-weight: 700;
+  color: #a371f7;
+  border: 1px solid #a371f7;
+  padding: 3px 8px;
+  border-radius: 4px;
+  white-space: nowrap;
+}
+.ml-result p { margin: 0; font-size: 13px; line-height: 1.5; color: #c9d1d9; }
+
+@media (max-width: 800px) {
+  .charts-grid { grid-template-columns: 1fr; }
+}
