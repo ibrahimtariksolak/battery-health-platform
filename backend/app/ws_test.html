@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+<head><title>WebSocket Test</title></head>
+<body>
+<h2>Canli Batarya Verisi</h2>
+<p id="status">Baglaniyor...</p>
+<pre id="output"></pre>
+<script>
+    const ws = new WebSocket("ws://127.0.0.1:8000/ws/telemetry");
+
+    ws.onopen = () => {
+        document.getElementById("status").textContent = "Baglanti acildi, veri bekleniyor...";
+    };
+
+    ws.onerror = (err) => {
+        document.getElementById("status").textContent = "HATA: baglanti kurulamadi.";
+        console.error("WebSocket hatasi:", err);
+    };
+
+    ws.onclose = () => {
+        document.getElementById("status").textContent = "Baglanti kapandi.";
+    };
+
+    ws.onmessage = (event) => {
+        const data = JSON.parse(event.data);
+        document.getElementById("status").textContent = "Canli veri aliniyor:";
+        document.getElementById("output").textContent =
+            `Voltaj: ${data.pack_voltage}V\nSoC: ${data.pack_soc}\nSicaklik: ${data.max_temperature_c}C\nZaman: ${data.timestamp}`;
+    };
+</script>
+</body>
+</html>
