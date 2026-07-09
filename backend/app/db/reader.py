@@ -112,3 +112,39 @@ def get_latest_cell_status(pack_id: str) -> list:
         }
         for r in rows
     ]
+def get_latest_session_id(pack_id: str):
+    conn = get_connection()
+    cur = conn.cursor()
+    cur.execute(
+        """
+        SELECT session_id FROM session
+        WHERE pack_id = %s
+        ORDER BY started_at DESC
+        LIMIT 1;
+        """,
+        (pack_id,),
+    )
+    row = cur.fetchone()
+    cur.close()
+    conn.close()
+    return str(row[0]) if row else None
+
+
+def get_session_current_temp_series(session_id: str):
+    conn = get_connection()
+    cur = conn.cursor()
+    cur.execute(
+        """
+        SELECT current_a, max_temperature_c
+        FROM pack_reading
+        WHERE session_id = %s AND current_a IS NOT NULL
+        ORDER BY time ASC;
+        """,
+        (session_id,),
+    )
+    rows = cur.fetchall()
+    cur.close()
+    conn.close()
+    currents = [r[0] for r in rows]
+    temps = [r[1] for r in rows]
+    return currents, temps

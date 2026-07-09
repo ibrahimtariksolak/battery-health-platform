@@ -8,6 +8,7 @@ import os
 
 sys.path.append(os.path.dirname(__file__))
 sys.path.append(os.path.join(os.path.dirname(__file__), "db"))
+sys.path.append(os.path.join(os.path.dirname(__file__), "..", "..", "ml"))
 
 import asyncio
 from contextlib import asynccontextmanager
@@ -15,9 +16,13 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI, WebSocket, WebSocketDisconnect, HTTPException, Query
 from fastapi.responses import HTMLResponse
 
-from reader import get_latest_pack_reading, get_pack_history, get_latest_cell_status
+from reader import (
+    get_latest_pack_reading, get_pack_history, get_latest_cell_status,
+    get_latest_session_id, get_session_current_temp_series,
+)
 from ws_manager import ConnectionManager
 from live_simulation import run_live_simulation
+from predict import predict_driving_style, generate_recommendation
 
 manager = ConnectionManager()
 simulation_task = None
@@ -131,3 +136,28 @@ WS_TEST_HTML = """
 @app.get("/ws-test", response_class=HTMLResponse)
 def ws_test_page():
     return WS_TEST_HTML
+
+@app.get("/ml/driving-style")
+def driving_style(pack_id: str = Query(..., description="Sorgulanacak pack ID'si, orn. PACK-1")):
+    session_id = get_latest_session_id(pack_id)
+    if session_id is None:
+        raise HTTPException(status_code=404, detail=f"'{pack_id}' icin oturum bulunamadi.")
+
+    currents, temps = get_session_current_temp_series(session_id)
+    if len(currents) < 30:
+        raise HTTPException(
+            status_code=400,
+            detail=f"Analiz icin yeterli veri yok ({len(currents)} okuma var, en az 30 gerekli). Biraz bekleyip tekrar dene.",
+        )
+
+    prediction = predict_driving_style(currents, temps)
+    recommendation = generate_recommendation(prediction)
+
+    return {
+        "pack_id": pack_id,
+        "session_id": session_id,
+        "sample_count": len(currents),
+        "driving_style": prediction["style"],
+        "features": prediction["features"],
+        "recommendation": recommendation,
+    }

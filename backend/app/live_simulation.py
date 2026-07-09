@@ -53,7 +53,9 @@ async def run_live_simulation(manager, pack_id: str = "PACK-1", style_value: str
             pack_rows.append((now, pack.pack_id, pack.pack_voltage, pack.pack_soc,
                               pack.max_temperature, pack.cell_voltage_delta,
                               pack.soh_estimator.soh_percent,
-                              pack.thermal_protection.state.value))
+                              pack.thermal_protection.state.value,
+                              current))
+
             for cell in pack.cells:
                 cell_rows.append((now, cell.cell_id, cell.soc, cell.voltage,
                                    cell.temperature_c, cell.balancing_active))

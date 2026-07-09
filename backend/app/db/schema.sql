@@ -18,6 +18,7 @@ CREATE TABLE IF NOT EXISTS pack_reading (
     pack_soc DOUBLE PRECISION,
     max_temperature_c DOUBLE PRECISION,
     cell_voltage_delta DOUBLE PRECISION,
+    current_a DOUBLE PRECISION,
     soh_percent DOUBLE PRECISION,
     thermal_state TEXT
 );
