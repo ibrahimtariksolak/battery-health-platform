@@ -12,7 +12,8 @@ def get_latest_pack_reading(pack_id: str) -> Optional[dict]:
     cur.execute(
         """
         SELECT time, pack_id, pack_voltage, pack_soc,
-               max_temperature_c, cell_voltage_delta
+               max_temperature_c, cell_voltage_delta,
+               soh_percent, thermal_state
         FROM pack_reading
         WHERE pack_id = %s
         ORDER BY time DESC
@@ -34,6 +35,8 @@ def get_latest_pack_reading(pack_id: str) -> Optional[dict]:
         "pack_soc": row[3],
         "max_temperature_c": row[4],
         "cell_voltage_delta": row[5],
+        "soh_percent": row[6],
+        "thermal_state": row[7],
     }
 
 
@@ -43,7 +46,8 @@ def get_pack_history(pack_id: str, limit: int = 100) -> list:
     cur.execute(
         """
         SELECT time, pack_id, pack_voltage, pack_soc,
-               max_temperature_c, cell_voltage_delta
+               max_temperature_c, cell_voltage_delta,
+               soh_percent, thermal_state
         FROM pack_reading
         WHERE pack_id = %s
         ORDER BY time DESC
@@ -63,6 +67,48 @@ def get_pack_history(pack_id: str, limit: int = 100) -> list:
             "pack_soc": r[3],
             "max_temperature_c": r[4],
             "cell_voltage_delta": r[5],
+            "soh_percent": r[6],
+            "thermal_state": r[7],
+        }
+        for r in rows
+    ]
+
+
+def get_latest_cell_status(pack_id: str) -> list:
+    """
+    Belirli bir pack'in en son zaman damgasindaki tum hucrelerinin
+    durumunu (SoC, voltaj, sicaklik, dengeleme aktif mi) doner.
+    """
+    conn = get_connection()
+    cur = conn.cursor()
+    cur.execute(
+        """
+        WITH latest_time AS (
+            SELECT MAX(cr.time) AS t
+            FROM cell_reading cr
+            JOIN session s ON cr.session_id = s.session_id
+            WHERE s.pack_id = %s
+        )
+        SELECT cr.cell_id, cr.soc, cr.voltage, cr.temperature_c, cr.balancing_active
+        FROM cell_reading cr
+        JOIN session s ON cr.session_id = s.session_id
+        CROSS JOIN latest_time
+        WHERE s.pack_id = %s AND cr.time = latest_time.t
+        ORDER BY cr.cell_id;
+        """,
+        (pack_id, pack_id),
+    )
+    rows = cur.fetchall()
+    cur.close()
+    conn.close()
+
+    return [
+        {
+            "cell_id": r[0],
+            "soc": r[1],
+            "voltage": r[2],
+            "temperature_c": r[3],
+            "balancing_active": r[4],
         }
         for r in rows
     ]

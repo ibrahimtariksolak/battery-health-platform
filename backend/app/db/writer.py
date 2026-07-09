@@ -41,7 +41,8 @@ def end_session(session_id: str):
 def log_batch(session_id: str, pack_rows: list, cell_rows: list):
     """
     Birikmis pack ve cell okumalarini tek seferde veritabanina yazar.
-    pack_rows: (time, pack_id, pack_voltage, pack_soc, max_temp, cell_delta) listesi
+    pack_rows: (time, pack_id, pack_voltage, pack_soc, max_temp, cell_delta,
+                soh_percent, thermal_state) listesi
     cell_rows: (time, cell_id, soc, voltage, temp, balancing_active) listesi
     """
     conn = get_connection()
@@ -52,11 +53,11 @@ def log_batch(session_id: str, pack_rows: list, cell_rows: list):
             """
             INSERT INTO pack_reading
                 (time, session_id, pack_id, pack_voltage, pack_soc,
-                 max_temperature_c, cell_voltage_delta)
-            VALUES (%s, %s, %s, %s, %s, %s, %s);
+                 max_temperature_c, cell_voltage_delta, soh_percent, thermal_state)
+            VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s);
             """,
-            [(t, session_id, pid, v, soc, temp, delta) for
-             (t, pid, v, soc, temp, delta) in pack_rows],
+            [(t, session_id, pid, v, soc, temp, delta, soh, thermal) for
+             (t, pid, v, soc, temp, delta, soh, thermal) in pack_rows],
         )
 
     if cell_rows:

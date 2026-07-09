@@ -10,7 +10,6 @@ CREATE TABLE IF NOT EXISTS session (
     ended_at TIMESTAMPTZ
 );
 
--- Pack seviyesinde zaman serisi verisi (hypertable)
 CREATE TABLE IF NOT EXISTS pack_reading (
     time TIMESTAMPTZ NOT NULL,
     session_id UUID NOT NULL REFERENCES session(session_id),
@@ -18,9 +17,10 @@ CREATE TABLE IF NOT EXISTS pack_reading (
     pack_voltage DOUBLE PRECISION,
     pack_soc DOUBLE PRECISION,
     max_temperature_c DOUBLE PRECISION,
-    cell_voltage_delta DOUBLE PRECISION
+    cell_voltage_delta DOUBLE PRECISION,
+    soh_percent DOUBLE PRECISION,
+    thermal_state TEXT
 );
-
 SELECT create_hypertable('pack_reading', 'time', if_not_exists => TRUE);
 
 -- Hucre seviyesinde detayli veri (hypertable)

@@ -15,7 +15,7 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI, WebSocket, WebSocketDisconnect, HTTPException, Query
 from fastapi.responses import HTMLResponse
 
-from reader import get_latest_pack_reading, get_pack_history
+from reader import get_latest_pack_reading, get_pack_history, get_latest_cell_status
 from ws_manager import ConnectionManager
 from live_simulation import run_live_simulation
 
@@ -65,6 +65,23 @@ def telemetry_history(
     limit: int = Query(100, ge=1, le=5000, description="Kac satir donsun"),
 ):
     return get_pack_history(pack_id, limit)
+
+@app.get("/bms/status")
+def bms_status(pack_id: str = Query(..., description="Sorgulanacak pack ID'si, orn. PACK-1")):
+    reading = get_latest_pack_reading(pack_id)
+    if reading is None:
+        raise HTTPException(status_code=404, detail=f"'{pack_id}' icin veri bulunamadi.")
+
+    cells = get_latest_cell_status(pack_id)
+
+    return {
+        "pack_id": pack_id,
+        "time": reading["time"],
+        "soh_percent": reading["soh_percent"],
+        "thermal_state": reading["thermal_state"],
+        "cell_voltage_delta": reading["cell_voltage_delta"],
+        "cells": cells,
+    }
 
 
 @app.websocket("/ws/telemetry")
