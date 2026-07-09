@@ -39,7 +39,7 @@ Detaylı mimari diyagram: `docs/architecture.md` (yakında eklenecek)
 | Gerçek zamanlı iletişim | WebSocket | Polling'e göre daha verimli canlı veri akışı |
 | Veritabanı | PostgreSQL + TimescaleDB | Zaman serisi verisi için optimize edilmiş SQL |
 | ML | scikit-learn (K-Means) | Hızlı, yorumlanabilir, düşük kaynak maliyeti |
-| Termal CV (opsiyonel) | OpenCV / basit autoencoder | Görüntü tabanlı anomali tespiti |
+| Termal CV | OpenCV / basit autoencoder | Görüntü tabanlı anomali tespiti |
 | Frontend | React + Recharts/Plotly | Canlı grafik çizimi |
 | Altyapı | Docker + docker-compose | Tek komutla ayağa kalkan, taşınabilir sistem |
 
@@ -64,7 +64,7 @@ Detaylı mimari diyagram: `docs/architecture.md` (yakında eklenecek)
 ## Yol Haritası
 
 - [x] Faz 0 — Proje iskeleti ve mimari planlama
-- [ ] Faz 1 — Veri simülatörü ve veritabanı
+- [x] Faz 1 — Veri simülatörü ve veritabanı
 - [ ] Faz 2 — Backend API ve gerçek zamanlı akış
 - [ ] Faz 3 — BMS mantığı (SoH, hücre dengeleme, termal koruma)
 - [ ] Faz 4 — Sürüş karakteri ML modülü
