@@ -15,25 +15,29 @@ Gerçek bir batarya donanımına bağlı değildir — amaç, gerçek BMS sistem
 - Proje, tek bir bileşene değil (sadece dashboard, sadece ML, sadece backend) uçtan uca bir sisteme odaklanır: veri üretiminden karar destek arayüzüne kadar tüm hattı kapsar.
 
 ## Sistem Mimarisi
+
+```
 Batarya Simülatörü (Python)
-│  (voltaj, akım, sıcaklık, SoC — fizik tabanlı)
-▼
+        │  (voltaj, akım, sıcaklık, SoC — fizik tabanlı)
+        ▼
 Backend API (FastAPI)  ──────────────►  TimescaleDB
-│  WebSocket (canlı akış)         (zaman serisi veri)
-▼
+        │  WebSocket (canlı akış)         (zaman serisi veri)
+        ▼
 ┌───────────────────────┐
 │  BMS Mantığı            │  SoH tahmini, hücre dengeleme,
 │  (bms_logic.py)         │  termal koruma state machine
 └───────────────────────┘
-│
-▼
+        │
+        ▼
 K-Means ML Modülü  ──────────────────►  /ml/driving-style
-(sürüş karakteri sınıflandırma)        endpoint'i
-│
-▼
+   (sürüş karakteri sınıflandırma)        endpoint'i
+        │
+        ▼
 React Dashboard (Vite + Recharts)
-canlı KPI kartları, grafikler,
-sürüş analizi paneli
+   canlı KPI kartları, grafikler,
+   sürüş analizi paneli
+```
+
 Detaylı mimari notları ve tasarım kararlarının gerekçeleri: [`docs/architecture.md`](docs/architecture.md)
 
 ## Teknoloji Yığını
@@ -50,6 +54,8 @@ Detaylı mimari notları ve tasarım kararlarının gerekçeleri: [`docs/archite
 | Altyapı | Docker (TimescaleDB için) | Veritabanının taşınabilir, tek komutla ayağa kalkan bir servis olması |
 
 ## Klasör Yapısı
+
+```
 ├── simulator/            # Bağımsız test edilebilir batarya fizik motoru
 │   ├── battery_simulator.py
 │   ├── bms_logic.py      # SoH tahmini + termal koruma state machine
@@ -67,6 +73,8 @@ Detaylı mimari notları ve tasarım kararlarının gerekçeleri: [`docs/archite
 │   └── models/           # Eğitilmiş model dosyası
 ├── frontend/              # React + Vite dashboard
 └── docs/                  # Mimari notlar, tasarım kararları
+```
+
 ## Kurulum
 
 ```bash
@@ -107,7 +115,7 @@ API dokümantasyonu (Swagger): `http://127.0.0.1:8000/docs`
 Batarya telemetrisi doğası gereği zaman serisi verisidir — sürekli artan, zaman damgasıyla sorgulanan, eski verinin nadiren güncellendiği bir yapı. TimescaleDB, tabloyu otomatik olarak zaman bazlı parçalara (chunk) böler (`create_hypertable`), bu da zaman aralığı sorgularını standart PostgreSQL'e göre belirgin şekilde hızlandırır. Aynı zamanda standart SQL ile sorgulanabildiği için (InfluxDB gibi ayrı bir sorgu dili öğrenmeye gerek kalmadan) geliştirme hızını korur.
 
 **Neden K-Means, DBSCAN değil?**
-Sürüş stili sayısının önceden bilindiği (Eko/Normal/Agresif — üç sabit kategori) bir problemde K-Means, k parametresini elle belirleyebildiğimiz için daha kontrollü ve yorumlanabilir sonuçlar veriyor. DBSCAN, k'yı önceden bilmediğimiz ve gürültülü/aykırı noktaları ayrı bir "noise" sınıfına ayırmak istediğimiz senaryolarda (örneğin anomali tespiti) daha uygun olurdu — ileride termal anomali tespiti eklenirse orada değerlendirilebilir. Bu projede k=3 seçimi, silhouette skoru analiziyle de doğrulanmıştır (bkz. `ml/train_model.py` çıktısı: k=3 için 0.93, en yakın diğer k değerlerinden belirgin şekilde yüksek).
+Sürüş stili sayısının önceden bilindiği (Eko/Normal/Agresif — üç sabit kategori) bir problemde K-Means, k parametresini elle belirleyebildiğimiz için daha kontrollü ve yorumlanabilir sonuçlar veriyor. DBSCAN, k'yı önceden bilmediğimiz senaryolarda daha uygun olurdu. Bu projede k=3 seçimi, silhouette skoru analiziyle de doğrulanmıştır (bkz. `ml/train_model.py` çıktısı: k=3 için 0.93, en yakın diğer k değerlerinden belirgin şekilde yüksek).
 
 **Neden WebSocket, polling değil?**
 Dashboard'un saniyede bir güncellenen bir veri akışını göstermesi gerekiyor. Polling (istemcinin her saniye "yeni veri var mı?" diye sorması) hem gereksiz HTTP overhead'i yaratır hem de gerçek gecikmeyi (veri üretilme anı ile gösterilme anı arasındaki fark) artırır. WebSocket, sunucunun veri üretilir üretilmez istemciye anında göndermesini sağlıyor — tek bağlantı üzerinden çift yönlü, düşük gecikmeli iletişim.
@@ -117,7 +125,7 @@ Dashboard'un saniyede bir güncellenen bir veri akışını göstermesi gerekiyo
 Şu an sistem tamamen yazılım tabanlı simülasyonla çalışıyor. Gerçek donanıma bağlanmak istenirse:
 - **Akım/voltaj sensörü:** ACS712 (akım) + basit bir voltaj bölücü devresi, bir ESP32'ye I2C/ADC üzerinden bağlanır
 - **Sıcaklık sensörü:** NTC termistör veya DS18B20 (dijital, daha hassas)
-- **Veri aktarımı:** ESP32 üzerinde çalışan basit bir firmware, okunan değerleri `POST /telemetry` endpoint'ine (Faz 2'de tanımlanan) periyodik olarak gönderir — böylece backend ve üzeri tüm katman (BMS mantığı, ML, dashboard) hiçbir değişiklik gerektirmeden gerçek veriyle çalışmaya devam eder.
+- **Veri aktarımı:** ESP32 üzerinde çalışan basit bir firmware, okunan değerleri `POST /telemetry` endpoint'ine periyodik olarak gönderir — böylece backend ve üzeri tüm katman (BMS mantığı, ML, dashboard) hiçbir değişiklik gerektirmeden gerçek veriyle çalışmaya devam eder.
 
 ## Sonuçlar / Doğrulama
 
