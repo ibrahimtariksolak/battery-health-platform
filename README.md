@@ -2,8 +2,6 @@
 
 **Savunma sanayii ve İKA (İnsansız Kara Aracı) uygulamaları için batarya sağlığı izleme, hücre dengeleme ve öngörücü bakım sistemi**
 
-> Durum: ✅ Çekirdek sistem tamamlandı (Faz 0-5) — Faz 6 (Termal CV) opsiyonel genişletme olarak planlanmıştır
-
 ## Proje Nedir?
 
 Bu proje, bir batarya/İKA sisteminin voltaj, akım, sıcaklık ve şarj durumu (SoC) verilerini fizik tabanlı simüle eden, bu veriyi bir zaman serisi veritabanında saklayan, üzerine klasik makine öğrenmesi ile sürüş/kullanım karakteri analizi ve temel BMS (Battery Management System) mantığı (SoH tahmini, hücre dengeleme, termal koruma) ekleyen, sonucu canlı bir web dashboard'unda gösteren uçtan uca bir sistemdir.
